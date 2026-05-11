@@ -1,0 +1,2595 @@
+week-5 vpc using EC2
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+week:6 vpc using baston server
+# WEEK-6 — VPC USING BASTION SERVER & NAT GATEWAY
+
+# Complete Step-by-Step AWS Lab Guide
+
+This guide follows your uploaded lab document exactly. 
+
+---
+
+# AIM
+
+Create:
+
+* Custom VPC
+* Public subnet
+* Private subnet
+* Bastion server
+* Database server
+* NAT Gateway
+
+Architecture:
+
+```text id="a1"
+Internet
+   ↓
+Bastion Server (Public Subnet)
+   ↓
+Database Server (Private Subnet)
+
+NAT Gateway
+   ↓
+Internet access for private subnet
+```
+
+---
+
+# PART 1 — CREATE VPC
+
+---
+
+# STEP 1 — Open VPC Service
+
+1. Login AWS Console
+2. Search:
+
+```text id="a2"
+VPC
+```
+
+3. Open:
+
+```text id="a3"
+VPC Dashboard
+```
+
+---
+
+# STEP 2 — Create VPC
+
+1. Left menu:
+
+```text id="a4"
+Your VPCs
+```
+
+2. Click:
+
+```text id="a5"
+Create VPC
+```
+
+---
+
+# STEP 3 — Configure VPC
+
+| Field               | Value       |
+| ------------------- | ----------- |
+| Resources to create | VPC only    |
+| Name tag            | MyCustomVPC |
+| IPv4 CIDR           | 10.0.0.0/16 |
+
+Exactly as in your document. 
+
+---
+
+# STEP 4 — Create VPC
+
+Click:
+
+```text id="a6"
+Create VPC
+```
+
+---
+
+# PART 2 — CREATE SUBNETS
+
+---
+
+# STEP 5 — Create Public Subnet
+
+1. Left menu:
+
+```text id="a7"
+Subnets
+```
+
+2. Click:
+
+```text id="a8"
+Create subnet
+```
+
+---
+
+# Configure Public Subnet
+
+| Field       | Value        |
+| ----------- | ------------ |
+| VPC         | MyCustomVPC  |
+| Subnet name | PublicSubnet |
+| AZ          | us-east-1a   |
+| IPv4 CIDR   | 10.0.1.0/24  |
+
+---
+
+# STEP 6 — Create Private Subnet
+
+Again click:
+
+```text id="a9"
+Create subnet
+```
+
+---
+
+# Configure Private Subnet
+
+| Field       | Value         |
+| ----------- | ------------- |
+| VPC         | MyCustomVPC   |
+| Subnet name | PrivateSubnet |
+| AZ          | us-east-1a    |
+| IPv4 CIDR   | 10.0.2.0/24   |
+
+Exactly as in your document. 
+
+---
+
+# PART 3 — CREATE INTERNET GATEWAY
+
+---
+
+# STEP 7 — Create Internet Gateway
+
+1. Left menu:
+
+```text id="a10"
+Internet Gateways
+```
+
+2. Click:
+
+```text id="a11"
+Create internet gateway
+```
+
+---
+
+# Configure
+
+| Field | Value |
+| ----- | ----- |
+| Name  | MyIGW |
+
+---
+
+# STEP 8 — Attach IGW to VPC
+
+1. Select:
+
+```text id="a12"
+MyIGW
+```
+
+2. Click:
+
+```text id="a13"
+Actions → Attach to VPC
+```
+
+3. Select:
+
+```text id="a14"
+MyCustomVPC
+```
+
+4. Click:
+
+```text id="a15"
+Attach internet gateway
+```
+
+---
+
+# PART 4 — CREATE ROUTE TABLE FOR PUBLIC SUBNET
+
+---
+
+# STEP 9 — Create Route Table
+
+1. Left menu:
+
+```text id="a16"
+Route Tables
+```
+
+2. Click:
+
+```text id="a17"
+Create route table
+```
+
+---
+
+# Configure
+
+| Field | Value            |
+| ----- | ---------------- |
+| Name  | PublicRouteTable |
+| VPC   | MyCustomVPC      |
+
+---
+
+# STEP 10 — Add Internet Route
+
+1. Select:
+
+```text id="a18"
+PublicRouteTable
+```
+
+2. Go:
+
+```text id="a19"
+Routes
+→ Edit routes
+```
+
+3. Click:
+
+```text id="a20"
+Add route
+```
+
+---
+
+# Add Route
+
+| Destination | Target           |
+| ----------- | ---------------- |
+| 0.0.0.0/0   | Internet Gateway |
+
+Choose:
+
+```text id="a21"
+MyIGW
+```
+
+Save changes.
+
+---
+
+# STEP 11 — Associate Public Subnet
+
+1. Go:
+
+```text id="a22"
+Subnet associations
+→ Edit subnet associations
+```
+
+2. Select:
+
+```text id="a23"
+PublicSubnet
+```
+
+3. Save.
+
+---
+
+# PART 5 — CREATE SECURITY GROUPS
+
+---
+
+# STEP 12 — Create Bastion Security Group
+
+1. EC2 →
+
+```text id="a24"
+Security Groups
+```
+
+2. Click:
+
+```text id="a25"
+Create security group
+```
+
+---
+
+# Configure
+
+| Field | Value       |
+| ----- | ----------- |
+| Name  | BastionSG   |
+| VPC   | MyCustomVPC |
+
+---
+
+# Add Inbound Rule
+
+| Type | Port | Source |
+| ---- | ---- | ------ |
+| SSH  | 22   | My IP  |
+
+Exactly as document. 
+
+---
+
+# STEP 13 — Create Database Security Group
+
+Create another SG.
+
+| Field | Value       |
+| ----- | ----------- |
+| Name  | DBSG        |
+| VPC   | MyCustomVPC |
+
+---
+
+# Add Rules
+
+| Type         | Port | Source      |
+| ------------ | ---- | ----------- |
+| SSH          | 22   | BastionSG   |
+| MYSQL/Aurora | 3306 | 10.0.1.0/24 |
+
+Exactly from your document. 
+
+---
+
+# PART 6 — CREATE EC2 INSTANCES
+
+---
+
+# STEP 14 — Launch Bastion Server
+
+EC2 →
+
+```text id="a26"
+Launch instance
+```
+
+---
+
+# Configure
+
+| Field                 | Value         |
+| --------------------- | ------------- |
+| Name                  | BastionServer |
+| AMI                   | Ubuntu        |
+| Instance type         | t2.micro      |
+| Key pair              | bastion.pem   |
+| VPC                   | MyCustomVPC   |
+| Subnet                | PublicSubnet  |
+| Auto assign public IP | Enable        |
+| Security group        | BastionSG     |
+
+---
+
+# STEP 15 — Launch Database Server
+
+Launch another EC2.
+
+---
+
+# Configure
+
+| Field                 | Value         |
+| --------------------- | ------------- |
+| Name                  | DBServer      |
+| AMI                   | Ubuntu        |
+| Instance type         | t2.micro      |
+| Key pair              | dbserver.pem  |
+| VPC                   | MyCustomVPC   |
+| Subnet                | PrivateSubnet |
+| Auto assign public IP | Disable       |
+| Security group        | DBSG          |
+
+Exactly as document. 
+
+---
+
+# PART 7 — COPY DB KEY TO BASTION
+
+---
+
+# STEP 16 — Open PowerShell
+
+Go to folder containing:
+
+* bastion.pem
+* dbserver.pem
+cmd:
+dir *.pem
+scp -i bastion.pem dbserver.pem ubuntu@<BASTION_PUBLIC_IP>:/home/ubuntu/
+ssh -i bastion.pem ubuntu@<BASTION_PUBLIC_IP>
+ls
+---
+
+# STEP 17 — Copy Key Using SCP
+
+Run:
+
+```bash id="a27"
+scp -i bastion.pem dbserver.pem ubuntu@<BASTION_PUBLIC_IP>:/home/ubuntu/
+```
+
+Exactly from your document. 
+
+---
+
+# PART 8 — CONNECT TO BASTION
+
+---
+
+# STEP 18 — SSH into Bastion
+
+Run:
+
+```bash id="a28"
+ssh -i bastion.pem ubuntu@<BASTION_PUBLIC_IP>
+```
+
+---
+
+# STEP 19 — Verify Keys
+
+Inside bastion:
+
+```bash id="a29"
+ls
+```
+
+Expected:
+
+```text id="a30"
+dbserver.pem
+```
+
+---
+
+# PART 9 — CONNECT TO PRIVATE DB SERVER
+
+---
+
+# STEP 20 — Give Key Permission
+
+Inside bastion:
+
+```bash id="a31"
+chmod 400 dbserver.pem
+```
+
+---
+
+# STEP 21 — SSH into DB Server
+
+Run:
+
+```bash id="a32"
+ssh -i dbserver.pem ubuntu@10.0.2.x
+```
+
+Replace:
+
+```text id="a33"
+10.0.2.x
+```
+
+with private IP of DB server.
+
+Exactly from your document. 
+
+---
+
+# RESULT
+
+You successfully connected:
+
+```text id="a34"
+Local Machine
+→ Bastion Server
+→ Private Database Server
+```
+
+---
+
+# PART 10 — CREATE NAT GATEWAY
+
+Exactly from uploaded document. 
+
+---
+
+# STEP 22 — Open NAT Gateways
+
+VPC →
+
+```text id="a35"
+NAT Gateways
+```
+
+---
+
+# STEP 23 — Create NAT Gateway
+
+Click:
+
+```text id="a36"
+Create NAT gateway
+```
+
+---
+
+# Configure
+
+| Field  | Value        |
+| ------ | ------------ |
+| Name   | MyNATGateway |
+| Subnet | PublicSubnet |
+
+---
+
+# STEP 24 — Allocate Elastic IP
+
+Click:
+
+```text id="a37"
+Allocate Elastic IP
+```
+
+---
+
+# STEP 25 — Create NAT Gateway
+
+Click:
+
+```text id="a38"
+Create NAT gateway
+```
+
+Wait until:
+
+```text id="a39"
+Available
+```
+
+---
+
+# PART 11 — CREATE PRIVATE ROUTE TABLE
+
+---
+
+# STEP 26 — Create Route Table
+
+VPC →
+
+```text id="a40"
+Route Tables
+→ Create route table
+```
+
+---
+
+# Configure
+
+| Field | Value             |
+| ----- | ----------------- |
+| Name  | PrivateRouteTable |
+| VPC   | MyCustomVPC       |
+
+---
+
+# STEP 27 — Associate Private Subnet
+
+1. Select:
+
+```text id="a41"
+PrivateRouteTable
+```
+
+2. Go:
+
+```text id="a42"
+Subnet associations
+→ Edit subnet associations
+```
+
+3. Select:
+
+```text id="a43"
+PrivateSubnet
+```
+
+Save.
+
+---
+
+# STEP 28 — Add NAT Route
+
+1. Go:
+
+```text id="a44"
+Routes
+→ Edit routes
+```
+
+2. Add:
+
+| Destination | Target      |
+| ----------- | ----------- |
+| 0.0.0.0/0   | NAT Gateway |
+
+Choose:
+
+```text id="a45"
+MyNATGateway
+```
+
+Save changes.
+
+Exactly as document. 
+
+---
+
+# PART 12 — TEST INTERNET IN PRIVATE SERVER
+
+---
+
+# STEP 29 — SSH into DB Server Again
+
+Use Bastion method.
+
+---
+
+# STEP 30 — Test Internet
+
+Inside DB server:
+
+Ubuntu:
+
+```bash id="a46"
+sudo apt update
+```
+
+If successful:
+
+* NAT Gateway working.
+
+Exactly from document observation. 
+
+---
+
+# FINAL RESULT
+
+```text id="a47"
+Successfully created VPC with Bastion Server and NAT Gateway. Private EC2 instance was securely accessed through Bastion server and internet access was enabled using NAT Gateway.
+```
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+week:7 basic python prob- lambda
+Your error is:
+
+```text id="a1"
+AccessDeniedException
+```
+
+This means your AWS lab account does NOT have permission to create or access SQS queues.
+
+The policy:
+
+```text id="a2"
+voc-cancel-cred
+```
+
+is denying SQS actions.
+
+This is common in:
+
+* AWS Academy
+* Vocareum labs
+* restricted student accounts
+
+So your issue is NOT wrong steps.
+
+It is a permission restriction from the lab environment.
+
+---
+
+# WHAT YOU SHOULD DO NOW
+
+You have 2 options.
+
+---
+
+# OPTION 1 — Use Different Queue Name (MOST IMPORTANT)
+
+Sometimes restricted labs block specific names.
+
+You used:
+
+```text id="a3"
+mysqsmy
+```
+
+Try a completely new simple name.
+
+---
+
+# CLEAN STEP-BY-STEP TO CREATE SQS
+
+# STEP 1 — Open SQS
+
+AWS Search:
+
+```text id="a4"
+SQS
+```
+
+Open:
+
+```text id="a5"
+Amazon Simple Queue Service
+```
+
+---
+
+# STEP 2 — Click Create Queue
+
+Click:
+
+```text id="a6"
+Create queue
+```
+
+---
+
+# STEP 3 — Configure Queue
+
+Choose:
+
+| Field      | Value      |
+| ---------- | ---------- |
+| Queue type | Standard   |
+| Name       | myqueue123 |
+
+IMPORTANT:
+Use NEW name like:
+
+```text id="a7"
+myqueue123
+```
+
+NOT:
+
+```text id="a8"
+mysqsmy
+```
+
+---
+
+# STEP 4 — Leave All Defaults
+
+Do NOT change:
+
+* encryption
+* policies
+* permissions
+
+Leave everything default.
+
+---
+
+# STEP 5 — Click Create Queue
+
+Click:
+
+```text id="a9"
+Create queue
+```
+
+---
+
+# IF STILL GETTING ACCESS DENIED
+
+Then your lab account completely blocks SQS.
+
+This means:
+
+* your IAM role restricted
+* not your mistake
+
+---
+
+# OPTION 2 — Use Another AWS Region
+
+Sometimes only one region blocked.
+
+Top-right AWS region:
+
+Current:
+
+```text id="a10"
+US East (N. Virginia)
+```
+
+Change to:
+
+* Ohio
+* Oregon
+* Mumbai
+
+Then try again.
+
+---
+
+# STEP-BY-STEP REGION CHANGE
+
+# STEP 1
+
+Top-right region dropdown.
+
+---
+
+# STEP 2
+
+Choose:
+
+```text id="a11"
+US East (Ohio)
+```
+
+OR
+
+```text id="a12"
+Asia Pacific (Mumbai)
+```
+
+---
+
+# STEP 3
+
+Open SQS again.
+
+---
+
+# STEP 4
+
+Create queue with new name:
+
+```text id="a13"
+myqueue2026
+```
+
+---
+
+# WHY THIS HAPPENS
+
+Your lab environment uses restricted IAM policies.
+
+The error specifically says:
+
+```text id="a14"
+explicit deny in identity-based policy
+```
+
+That means:
+
+* AWS admin blocked the action
+* user cannot override it
+
+---
+
+# IMPORTANT FOR RECORD
+
+If lab still blocks SQS, write observation as:
+
+```text id="a15"
+SQS queue creation could not be completed due to IAM permission restrictions in the lab environment.
+```
+
+---
+
+# YOUR LAMBDA TASK GUIDE
+
+Your uploaded Lambda lab file explains the exact Lambda creation steps. 
+
+You can still complete Lambda experiment even if SQS blocked.
+
+---
+
+# CLEAN LAMBDA STEPS
+
+# STEP 1 — Open Lambda
+
+Search:
+
+```text id="a16"
+Lambda
+```
+
+---
+
+# STEP 2 — Create Function
+
+Click:
+
+```text id="a17"
+Create function
+```
+
+Choose:
+
+```text id="a18"
+Author from scratch
+```
+
+---
+
+# STEP 3 — Configure
+
+| Field         | Value               |
+| ------------- | ------------------- |
+| Function name | basic-python-lambda |
+| Runtime       | Python 3.9          |
+
+Exactly as in your uploaded lab file. 
+
+---
+
+# STEP 4 — Paste Code
+
+```python id="a19"
+import json
+
+def lambda_handler(event, context):
+    a = event.get('num1', 0)
+    b = event.get('num2', 0)
+
+    result = a + b
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'sum': result
+        })
+    }
+```
+
+---
+
+# STEP 5 — Deploy
+
+Click:
+
+```text id="a20"
+Deploy
+```
+
+---
+
+# STEP 6 — Create Test Event
+
+Click:
+
+```text id="a21"
+Test
+```
+
+Use JSON:
+
+```json id="a22"
+{
+  "num1": 10,
+  "num2": 20
+}
+```
+
+---
+
+# STEP 7 — Run Test
+
+Click:
+
+```text id="a23"
+Test
+```
+
+Expected output:
+
+```json id="a24"
+{
+  "statusCode": 200,
+  "body": "{\"sum\": 30}"
+}
+```
+
+---
+
+# FINAL ANSWER
+
+Your SQS error is due to:
+
+```text id="a25"
+IAM permission restrictions in the lab account
+```
+
+Try:
+
+1. new queue name
+2. different region
+
+If still blocked:
+
+* proceed with Lambda task separately.
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------
+week:8 sns - sqs, s3-sns-sqs-lqmbda
+# WEEK-8 — SNS, SQS & S3-SNS-SQS-LAMBDA SERVICES
+
+# Complete Step-by-Step Lab Guide
+
+This guide follows your uploaded lab document exactly. 
+
+---
+
+# EXPERIMENT 1 — SNS EMAIL NOTIFICATION
+
+# AIM
+
+To create:
+
+* SNS Topic
+* Email Subscription
+* Send notification email
+
+---
+
+# PART A — CREATE SNS TOPIC & SEND EMAIL
+
+---
+
+# STEP 1 — Open SNS Service
+
+1. Login AWS Console
+2. In search bar type:
+
+```text id="a1"
+SNS
+```
+
+3. Open:
+
+```text id="a2"
+Amazon SNS
+```
+
+---
+
+# STEP 2 — Create SNS Topic
+
+1. Left panel →
+
+```text id="a3"
+Topics
+```
+
+2. Click:
+
+```text id="a4"
+Create topic
+```
+
+---
+
+# STEP 3 — Configure Topic
+
+| Field | Value        |
+| ----- | ------------ |
+| Type  | Standard     |
+| Name  | MyEmailTopic |
+
+Leave remaining settings default.
+
+---
+
+# STEP 4 — Create Topic
+
+Click:
+
+```text id="a5"
+Create topic
+```
+
+SNS topic created successfully.
+
+Exactly as in your lab document. 
+
+---
+
+# STEP 5 — Create Email Subscription
+
+1. Open created topic
+2. Go:
+
+```text id="a6"
+Subscriptions
+```
+
+3. Click:
+
+```text id="a7"
+Create subscription
+```
+
+---
+
+# STEP 6 — Configure Subscription
+
+| Field    | Value              |
+| -------- | ------------------ |
+| Protocol | Email              |
+| Endpoint | Your email address |
+
+Example:
+
+```text id="a8"
+abc@gmail.com
+```
+
+---
+
+# STEP 7 — Create Subscription
+
+Click:
+
+```text id="a9"
+Create subscription
+```
+
+---
+
+# STEP 8 — Confirm Email Subscription
+
+1. Open email inbox
+2. You receive SNS mail
+3. Click:
+
+```text id="a10"
+Confirm subscription
+```
+
+Now email is subscribed successfully.
+
+---
+
+# STEP 9 — Publish Test Message
+
+1. Open SNS topic
+2. Click:
+
+```text id="a11"
+Publish message
+```
+
+---
+
+# STEP 10 — Enter Message
+
+| Field   | Value                  |
+| ------- | ---------------------- |
+| Subject | Test Mail              |
+| Message | Hello this is SNS test |
+
+---
+
+# STEP 11 — Publish
+
+Click:
+
+```text id="a12"
+Publish message
+```
+
+---
+
+# STEP 12 — Verify Email
+
+Check inbox.
+
+You receive notification email.
+
+---
+
+# RESULT
+
+```text id="a13"
+SNS topic and email subscription were successfully created and notification email was received successfully.
+```
+
+---
+
+# EXPERIMENT 2 — S3 → SNS → EMAIL NOTIFICATION
+
+---
+
+# AIM
+
+When file uploaded to S3:
+
+* SNS sends email automatically
+
+Architecture:
+
+```text id="a14"
+S3 Bucket
+   ↓
+SNS Topic
+   ↓
+Email Notification
+```
+
+Exactly from your document. 
+
+---
+
+# STEP 1 — Create S3 Bucket
+
+1. Search:
+
+```text id="a15"
+S3
+```
+
+2. Open:
+
+```text id="a16"
+Amazon S3
+```
+
+3. Click:
+
+```text id="a17"
+Create bucket
+```
+
+---
+
+# STEP 2 — Configure Bucket
+
+| Field       | Value                 |
+| ----------- | --------------------- |
+| Bucket name | my-upload-bucket-2026 |
+| Region      | Same as SNS region    |
+
+Leave defaults.
+
+---
+
+# STEP 3 — Create Bucket
+
+Click:
+
+```text id="a18"
+Create bucket
+```
+
+---
+
+# STEP 4 — Create SNS Topic
+
+Reuse:
+
+```text id="a19"
+MyEmailTopic
+```
+
+OR create new topic:
+
+```text id="a20"
+S3UploadNotification
+```
+
+---
+
+# STEP 5 — Confirm Email Subscription
+
+Ensure email subscription already confirmed.
+
+---
+
+# STEP 6 — Open SNS Topic Policy
+
+1. Open SNS topic
+2. Go:
+
+```text id="a21"
+Access policy
+```
+
+3. Click:
+
+```text id="a22"
+Edit
+```
+
+---
+
+# STEP 7 — Configure S3 Event Notification
+
+1. Open S3 bucket
+2. Go:
+
+```text id="a23"
+Properties
+```
+
+3. Scroll:
+
+```text id="a24"
+Event notifications
+```
+
+4. Click:
+
+```text id="a25"
+Create event notification
+```
+
+---
+
+# STEP 8 — Configure Notification
+
+| Field       | Value                    |
+| ----------- | ------------------------ |
+| Event name  | UploadNotification       |
+| Event type  | All object create events |
+| Destination | SNS Topic                |
+
+Select:
+
+```text id="a26"
+S3UploadNotification
+```
+
+---
+
+# STEP 9 — Save
+
+Click:
+
+```text id="a27"
+Save changes
+```
+
+---
+
+# STEP 10 — Upload File
+
+1. Open bucket
+2. Click:
+
+```text id="a28"
+Upload
+```
+
+3. Upload any file.
+
+---
+
+# STEP 11 — Verify Email
+
+After upload:
+
+* S3 triggers SNS
+* SNS sends email
+
+Check inbox.
+
+---
+
+# RESULT
+
+```text id="a29"
+S3 bucket upload event successfully triggered SNS notification and email was received successfully.
+```
+
+---
+
+# EXPERIMENT 3 — SQS QUEUE
+
+---
+
+# AIM
+
+To:
+
+* create SQS queue
+* send messages
+* receive messages
+
+Exactly from your lab. 
+
+---
+
+# STEP 1 — Open SQS
+
+Search:
+
+```text id="a30"
+SQS
+```
+
+Open:
+
+```text id="a31"
+Amazon Simple Queue Service
+```
+
+---
+
+# STEP 2 — Create Queue
+
+Click:
+
+```text id="a32"
+Create queue
+```
+
+---
+
+# STEP 3 — Configure Queue
+
+| Field | Value    |
+| ----- | -------- |
+| Type  | Standard |
+| Name  | MyQueue  |
+
+Leave defaults.
+
+---
+
+# STEP 4 — Create Queue
+
+Click:
+
+```text id="a33"
+Create queue
+```
+
+---
+
+# STEP 5 — Send Message
+
+1. Open:
+
+```text id="a34"
+MyQueue
+```
+
+2. Click:
+
+```text id="a35"
+Send and receive messages
+```
+
+---
+
+# STEP 6 — Enter Message
+
+Message body:
+
+```text id="a36"
+Hello this is SQS test message
+```
+
+---
+
+# STEP 7 — Send
+
+Click:
+
+```text id="a37"
+Send message
+```
+
+---
+
+# STEP 8 — Receive Message
+
+Click:
+
+```text id="a38"
+Poll for messages
+```
+
+You will see:
+
+```text id="a39"
+Hello this is SQS test message
+```
+
+---
+
+# STEP 9 — Delete Message
+
+(Optional)
+
+Click:
+
+```text id="a40"
+Delete message
+```
+
+---
+
+# RESULT
+
+```text id="a41"
+SQS queue was successfully created and messages were sent and received successfully.
+```
+
+---
+
+# EXPERIMENT 4 — S3 → SNS → SQS → LAMBDA
+
+# AIM
+
+Create serverless architecture:
+
+```text id="a42"
+S3
+ ↓
+SNS
+ ↓
+SQS
+ ↓
+Lambda
+```
+
+Exactly from your uploaded document. 
+
+---
+
+# STEP 1 — Create S3 Bucket
+
+Open S3.
+
+Click:
+
+```text id="a43"
+Create bucket
+```
+
+---
+
+# Configure
+
+| Field       | Value              |
+| ----------- | ------------------ |
+| Bucket name | mys3eventbucket123 |
+
+---
+
+# STEP 2 — Create SNS Topic
+
+Open SNS.
+
+Create topic:
+
+| Field | Value        |
+| ----- | ------------ |
+| Type  | Standard     |
+| Name  | MyS3SNSTopic |
+
+Copy SNS ARN.
+
+---
+
+# STEP 3 — Create SQS Queue
+
+Open SQS.
+
+Create queue:
+
+| Field | Value     |
+| ----- | --------- |
+| Type  | Standard  |
+| Name  | MyS3Queue |
+
+Copy Queue ARN.
+
+---
+
+# STEP 4 — Subscribe SQS to SNS
+
+1. Open:
+
+```text id="a44"
+MyS3SNSTopic
+```
+
+2. Click:
+
+```text id="a45"
+Create subscription
+```
+
+---
+
+# Configure
+
+| Field    | Value      |
+| -------- | ---------- |
+| Protocol | Amazon SQS |
+| Endpoint | MyS3Queue  |
+
+---
+
+# STEP 5 — Create Subscription
+
+Click:
+
+```text id="a46"
+Create subscription
+```
+
+---
+
+# STEP 6 — Configure S3 Event Notification
+
+Open S3 bucket →
+
+```text id="a47"
+Properties
+→ Event notifications
+```
+
+Click:
+
+```text id="a48"
+Create event notification
+```
+
+---
+
+# Configure
+
+| Field       | Value                    |
+| ----------- | ------------------------ |
+| Event name  | S3UploadEvent            |
+| Event type  | All object create events |
+| Destination | SNS Topic                |
+
+Choose:
+
+```text id="a49"
+MyS3SNSTopic
+```
+
+---
+
+# STEP 7 — Save
+
+Click:
+
+```text id="a50"
+Save changes
+```
+
+---
+
+# STEP 8 — Test Upload
+
+Upload any file into bucket.
+
+Flow:
+
+```text id="a51"
+S3
+ ↓
+SNS
+ ↓
+SQS
+```
+
+---
+
+# STEP 9 — Verify Message in SQS
+
+Open:
+
+```text id="a52"
+MyS3Queue
+```
+
+Click:
+
+```text id="a53"
+Send and receive messages
+```
+
+Then:
+
+```text id="a54"
+Poll for messages
+```
+
+You will see S3 notification message.
+
+---
+
+# STEP 10 — Create Lambda Function
+
+Search:
+
+```text id="a55"
+Lambda
+```
+
+Open:
+
+```text id="a56"
+AWS Lambda
+```
+
+---
+
+# STEP 11 — Create Function
+
+Click:
+
+```text id="a57"
+Create function
+```
+
+---
+
+# Configure
+
+| Field         | Value               |
+| ------------- | ------------------- |
+| Author        | From scratch        |
+| Function name | SQSConsumerFunction |
+| Runtime       | Python 3.x          |
+
+---
+
+# STEP 12 — Create Function
+
+Click:
+
+```text id="a58"
+Create function
+```
+
+---
+
+# STEP 13 — Add SQS Trigger
+
+1. Open Lambda function
+2. Click:
+
+```text id="a59"
+Add trigger
+```
+
+---
+
+# Configure Trigger
+
+| Field        | Value     |
+| ------------ | --------- |
+| Trigger type | SQS       |
+| Queue        | MyS3Queue |
+
+---
+
+# STEP 14 — Add Trigger
+
+Click:
+
+```text id="a60"
+Add
+```
+
+---
+
+# STEP 15 — Replace Lambda Code
+
+Paste:
+
+```python id="a61"
+def lambda_handler(event, context):
+    for record in event['Records']:
+        print("Message received from SQS:")
+        print(record['body'])
+
+    return {
+        'statusCode': 200,
+        'body': 'Message processed successfully'
+    }
+```
+
+---
+
+# STEP 16 — Deploy Lambda
+
+Click:
+
+```text id="a62"
+Deploy
+```
+
+---
+
+# STEP 17 — Upload File to S3
+
+Upload file again.
+
+Flow:
+
+```text id="a63"
+S3
+ ↓
+SNS
+ ↓
+SQS
+ ↓
+Lambda
+```
+
+---
+
+# STEP 18 — Verify Lambda Logs
+
+Go:
+
+```text id="a64"
+Lambda
+→ Monitor
+→ View CloudWatch Logs
+```
+
+You will see:
+
+```text id="a65"
+Message received from SQS
+```
+
+---
+
+# FINAL RESULT
+
+```text id="a66"
+S3, SNS, SQS, and Lambda services were successfully integrated to implement a serverless event-driven architecture.
+```
+
+
+
+---------------------------------------------------------------------------------------------------------------------
+week:9 Elastic load balance
+
+# Complete Detailed Guide — Elastic Load Balancer (ELB) + Auto Scaling Group (ASG) in AWS
+
+This guide follows your uploaded Week-9 lab document exactly. 
+
+---
+
+# AIM
+
+To implement:
+
+* Elastic Load Balancer (ALB)
+* Auto Scaling Group (ASG)
+* Multiple EC2 web servers
+
+using AWS EC2.
+
+---
+
+# ARCHITECTURE OVERVIEW
+
+```text id="a1"
+Users
+   ↓
+Application Load Balancer (ALB)
+   ↓
+EC2 Instance 1      EC2 Instance 2
+(Server 1)          (Server 2)
+
+ASG automatically creates/replaces instances
+```
+
+---
+
+# PART 1 — CREATE TWO WEB SERVERS
+
+# STEP 1 — Launch EC2 Instance 1
+
+## 1. Open EC2 Console
+
+Go to:
+
+[AWS EC2 Console](https://console.aws.amazon.com/ec2/?utm_source=chatgpt.com)
+
+---
+
+## 2. Click
+
+```text id="a2"
+Launch Instance
+```
+
+---
+
+## 3. Configure Instance
+
+| Setting       | Value          |
+| ------------- | -------------- |
+| Name          | webserver-1    |
+| AMI           | Amazon Linux 2 |
+| Instance Type | t2.micro       |
+
+---
+
+## 4. Key Pair
+
+Select existing key pair OR create new one.
+
+Download `.pem` file.
+
+---
+
+## 5. Configure Security Group
+
+Allow:
+
+| Type | Port | Source   |
+| ---- | ---- | -------- |
+| SSH  | 22   | My IP    |
+| HTTP | 80   | Anywhere |
+
+Exactly as given in your lab manual. 
+
+---
+
+## 6. Launch Instance
+
+Click:
+
+```text id="a3"
+Launch Instance
+```
+
+---
+
+# STEP 2 — Connect to EC2
+
+Select instance →
+
+```text id="a4"
+Connect
+```
+
+Use:
+
+```text id="a5"
+EC2 Instance Connect
+```
+
+---
+
+# STEP 3 — Install Apache Web Server
+
+Run these commands exactly:
+
+```bash id="a6"
+sudo yum update -y
+```
+
+```bash id="a7"
+sudo yum install httpd -y
+```
+
+```bash id="a8"
+sudo systemctl start httpd
+```
+
+```bash id="a9"
+sudo systemctl enable httpd
+```
+
+---
+
+# STEP 4 — Create Webpage
+
+Run:
+
+```bash id="a10"
+echo "This is Server 1" | sudo tee /var/www/html/index.html
+```
+
+---
+
+# STEP 5 — Verify Server 1
+
+Copy:
+
+```text id="a11"
+Public IPv4 address
+```
+
+Open in browser.
+
+You should see:
+
+```text id="a12"
+This is Server 1
+```
+
+---
+
+# STEP 6 — Create Second EC2 Instance
+
+Repeat all steps.
+
+Change:
+
+| Setting | Value       |
+| ------- | ----------- |
+| Name    | webserver-2 |
+
+---
+
+# STEP 7 — Configure Server 2
+
+Run:
+
+```bash id="a13"
+sudo yum update -y
+sudo yum install httpd -y
+sudo systemctl start httpd
+sudo systemctl enable httpd
+```
+
+---
+
+# STEP 8 — Create Server 2 Page
+
+Run:
+
+```bash id="a14"
+echo "This is Server 2" | sudo tee /var/www/html/index.html
+```
+
+---
+
+# STEP 9 — Verify Server 2
+
+Open second EC2 public IP.
+
+You should see:
+
+```text id="a15"
+This is Server 2
+```
+
+---
+
+# PART 2 — CREATE LOAD BALANCER
+
+---
+
+# STEP 10 — Create Security Group for Load Balancer
+
+Go:
+
+```text id="a16"
+EC2 → Security Groups → Create Security Group
+```
+
+---
+
+## Configure
+
+| Field | Value |
+| ----- | ----- |
+| Name  | lb-sg |
+
+Inbound Rule:
+
+| Type | Port | Source   |
+| ---- | ---- | -------- |
+| HTTP | 80   | Anywhere |
+
+Exactly as given in your document. 
+
+Click:
+
+```text id="a17"
+Create Security Group
+```
+
+---
+
+# STEP 11 — Create Application Load Balancer
+
+Go:
+
+```text id="a18"
+EC2 → Load Balancers
+```
+
+Click:
+
+```text id="a19"
+Create Load Balancer
+```
+
+Choose:
+
+```text id="a20"
+Application Load Balancer
+```
+
+---
+
+# STEP 12 — Configure ALB
+
+| Setting | Value           |
+| ------- | --------------- |
+| Name    | my-alb          |
+| Scheme  | Internet-facing |
+| IP Type | IPv4            |
+
+Listener:
+
+```text id="a21"
+HTTP : 80
+```
+
+---
+
+# STEP 13 — Availability Zones
+
+Select:
+
+* Default VPC
+* All subnets
+
+Exactly as given in document. 
+
+---
+
+# STEP 14 — Attach Security Group
+
+Choose:
+
+```text id="a22"
+lb-sg
+```
+
+---
+
+# STEP 15 — Create Target Group
+
+Click:
+
+```text id="a23"
+Create target group
+```
+
+---
+
+## Configure
+
+| Field       | Value          |
+| ----------- | -------------- |
+| Name        | web-servers-tg |
+| Target Type | Instance       |
+| Protocol    | HTTP           |
+| Port        | 80             |
+
+Health check path:
+
+```text id="a24"
+/
+```
+
+---
+
+# STEP 16 — Register Targets
+
+Select:
+
+* webserver-1
+* webserver-2
+
+Click:
+
+```text id="a25"
+Include as pending
+```
+
+Then:
+
+```text id="a26"
+Create target group
+```
+
+---
+
+# STEP 17 — Create Load Balancer
+
+Review settings.
+
+Click:
+
+```text id="a27"
+Create Load Balancer
+```
+
+Wait 2–5 minutes.
+
+---
+
+# STEP 18 — Verify Load Balancer
+
+Go:
+
+```text id="a28"
+Load Balancers
+```
+
+Select ALB.
+
+Copy:
+
+```text id="a29"
+DNS Name
+```
+
+Open in browser.
+
+Refresh multiple times.
+
+You should alternately see:
+
+```text id="a30"
+This is Server 1
+```
+
+and
+
+```text id="a31"
+This is Server 2
+```
+
+Exactly as stated in your document. 
+
+---
+
+# STEP 19 — Check Health
+
+Go:
+
+```text id="a32"
+Target Groups → Targets
+```
+
+Both instances should show:
+
+```text id="a33"
+Healthy
+```
+
+---
+
+# PART 3 — CREATE AUTO SCALING GROUP
+
+---
+
+# STEP 20 — Create AMI
+
+Go:
+
+```text id="a34"
+EC2 → Instances
+```
+
+Select:
+
+```text id="a35"
+webserver-1
+```
+
+Click:
+
+```text id="a36"
+Actions → Image and Templates → Create Image
+```
+
+---
+
+## Configure
+
+| Field      | Value            |
+| ---------- | ---------------- |
+| Image Name | my-webserver-AMI |
+
+Click:
+
+```text id="a37"
+Create Image
+```
+
+Wait until AMI status becomes:
+
+```text id="a38"
+Available
+```
+
+Exactly from document. 
+
+---
+
+# STEP 21 — Create Launch Template
+
+Go:
+
+```text id="a39"
+EC2 → Launch Templates
+```
+
+Click:
+
+```text id="a40"
+Create Launch Template
+```
+
+---
+
+## Configure
+
+| Field         | Value              |
+| ------------- | ------------------ |
+| Name          | my-launch-template |
+| AMI           | my-webserver-AMI   |
+| Instance Type | t2.micro           |
+| Key Pair      | Existing key pair  |
+
+Security Group:
+
+* select web server SG
+
+---
+
+# STEP 22 — Create Launch Template
+
+Click:
+
+```text id="a41"
+Create Launch Template
+```
+
+---
+
+# STEP 23 — Create Auto Scaling Group
+
+Go:
+
+```text id="a42"
+EC2 → Auto Scaling Groups
+```
+
+Click:
+
+```text id="a43"
+Create Auto Scaling Group
+```
+
+---
+
+## Configure
+
+| Field           | Value              |
+| --------------- | ------------------ |
+| Name            | webserver-asg      |
+| Launch Template | my-launch-template |
+
+---
+
+# STEP 24 — Network Settings
+
+Select:
+
+* Default VPC
+* All subnets
+
+---
+
+# STEP 25 — Attach Load Balancer
+
+Choose:
+
+```text id="a44"
+Attach to existing load balancer
+```
+
+Select:
+
+```text id="a45"
+my-alb
+```
+
+Health check:
+
+```text id="a46"
+HTTP
+```
+
+Grace period:
+
+```text id="a47"
+300
+```
+
+---
+
+# STEP 26 — Configure Group Size
+
+| Setting          | Value |
+| ---------------- | ----- |
+| Desired Capacity | 2     |
+| Minimum          | 1     |
+| Maximum          | 4     |
+
+Exactly as in document. 
+
+---
+
+# STEP 27 — Create ASG
+
+Click:
+
+```text id="a48"
+Create Auto Scaling Group
+```
+
+---
+
+# STEP 28 — Verify ASG
+
+Go:
+
+```text id="a49"
+Auto Scaling Groups → Instances
+```
+
+You should see:
+
+* running instances
+* healthy instances
+
+---
+
+# STEP 29 — Test Auto Recovery
+
+Terminate one instance manually.
+
+ASG automatically launches replacement instance.
+
+Exactly as in your document. 
+
+---
+
+# STEP 30 — Final Load Balancer Test
+
+Open ALB DNS again.
+
+Refresh multiple times.
+
+Traffic distributes automatically.
+
+---
+
+# FINAL OBSERVATIONS
+
+You successfully observed:
+
+| AWS Service     | Purpose               |
+| --------------- | --------------------- |
+| EC2             | Web servers           |
+| ALB             | Traffic distribution  |
+| ASG             | Auto instance scaling |
+| Target Groups   | Health checking       |
+| Security Groups | Firewall rules        |
+
+---
+
+# RESULT
+
+```text id="a50"
+Elastic Load Balancer and Auto Scaling Group were successfully implemented using AWS EC2 instances. Traffic was distributed across multiple servers, and Auto Scaling automatically maintained healthy instances.
+```
+
+---
+
+# VERY IMPORTANT — TERMINATE RESOURCES
+
+After lab:
+
+Delete:
+
+* EC2 instances
+* ALB
+* Target groups
+* ASG
+* Launch template
+
+Otherwise AWS billing continues.
+
+---
+
+# IMPORTANT VIVA QUESTIONS
+
+## What is ELB?
+
+Elastic Load Balancer distributes incoming traffic among multiple servers.
+
+---
+
+## What is ASG?
+
+Auto Scaling Group automatically increases/decreases EC2 instances.
+
+---
+
+## What is Health Check?
+
+It detects unhealthy instances and removes them from traffic.
+
+---
+
+## Difference Between ELB and ASG?
+
+| ELB                 | ASG                    |
+| ------------------- | ---------------------- |
+| Distributes traffic | Manages instance count |
+| High availability   | Auto scaling           |
+
+
+
+---------------------------------------------------------------------------------------------------------------------
+week:10 Elastic beanstalk
+create application 
+create env
+select php 
+deploy and upload 
