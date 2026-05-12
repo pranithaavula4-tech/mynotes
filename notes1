@@ -1,5 +1,694 @@
+week-1 elastic compute cloud
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+week-4 simple storage service
+
+# AWS S3 TASK — COMPLETE STEP-BY-STEP GUIDE
+
+Based on your uploaded document 
+
+---
+
+# TASK 1 — CREATE S3 BUCKET & ENABLE PUBLIC ACCESS
+
+---
+
+# STEP 1 — OPEN S3
+
+1. Login to AWS Console
+
+2. Search:
+
+```text id="w7wjow"
+S3
+```
+
+3. Open Amazon S3
+
+---
+
+# STEP 2 — CREATE BUCKET
+
+1. Click:
+
+```text id="c0m6z4"
+Create bucket
+```
+
+2. Enter:
+
+| Field       | Value                |
+| ----------- | -------------------- |
+| Bucket name | my-public-bucket-123 |
+| Region      | Nearest region       |
+
+---
+
+# STEP 3 — DISABLE BLOCK PUBLIC ACCESS
+
+Under:
+
+```text id="yrvlu4"
+Block Public Access settings
+```
+
+Do:
+
+❌ Uncheck:
+
+```text id="2g8emk"
+Block all public access
+```
+
+✔ Check:
+
+```text id="n1r89l"
+I acknowledge that this bucket will become public
+```
+
+4. Click:
+
+```text id="qcxmiy"
+Create bucket
+```
+
+---
+
+# STEP 4 — ENABLE ACLS
+
+1. Open bucket
+
+2. Go to:
+
+```text id="jq8xpj"
+Permissions
+```
+
+3. Scroll to:
+
+```text id="07wstg"
+Object Ownership
+```
+
+4. Click:
+
+```text id="p4ga6o"
+Edit
+```
+
+5. Select:
+
+```text id="r03ghz"
+ACLs enabled
+```
+
+6. Choose:
+
+```text id="vjlwmr"
+Bucket owner preferred
+```
+
+7. Save changes
+
+8. Type:
+
+```text id="80vw2v"
+confirm
+```
+
+if asked
+
+---
+
+# STEP 5 — ENABLE BUCKET PUBLIC READ
+
+1. In bucket → Permissions
+
+2. Scroll to:
+
+```text id="5g8z6r"
+Access Control List (ACL)
+```
+
+3. Click:
+
+```text id="1pj2d5"
+Edit
+```
+
+4. Under:
+
+```text id="f3f2u0"
+Everyone (public access)
+```
+
+Enable:
+
+```text id="sq9hso"
+Read
+```
+
+5. Check confirmation checkbox
+
+6. Click:
+
+```text id="yt5f2h"
+Save changes
+```
+
+---
+
+# TASK 2 — STATIC WEBSITE HOSTING
+
+---
+
+# STEP 6 — CREATE HTML FILE
+
+Create file:
+
+```text id="yu08o6"
+index.html
+```
+
+Paste this:
+
+```html id="13pq2m"
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My S3 Website</title>
+</head>
+<body>
+    <h1>Welcome to My AWS S3 Static Website</h1>
+    <p>Website hosted using Amazon S3</p>
+</body>
+</html>
+```
+
+Save file.
+
+---
+
+# STEP 7 — UPLOAD HTML FILE
+
+1. Open bucket
+
+2. Click:
+
+```text id="p7l4wx"
+Objects
+```
+
+3. Click:
+
+```text id="zj1w73"
+Upload
+```
+
+4. Click:
+
+```text id="19c25l"
+Add files
+```
+
+5. Select:
+
+```text id="dl8hzj"
+index.html
+```
+
+6. Click:
+
+```text id="38t4wx"
+Upload
+```
+
+---
+
+# STEP 8 — ENABLE STATIC WEBSITE HOSTING
+
+1. Open:
+
+```text id="8a5ivx"
+Properties
+```
+
+2. Scroll to:
+
+```text id="z8g3fa"
+Static website hosting
+```
+
+3. Click:
+
+```text id="q7edgc"
+Edit
+```
+
+4. Select:
+
+```text id="v7y6x8"
+Enable
+```
+
+5. Choose:
+
+```text id="tff4o9"
+Host a static website
+```
+
+6. Enter:
+
+| Field          | Value      |
+| -------------- | ---------- |
+| Index document | index.html |
+
+7. Leave Error document empty
+
+8. Click:
+
+```text id="cmvlaf"
+Save changes
+```
+
+---
+
+# STEP 9 — ENABLE OBJECT PUBLIC READ
+
+1. Open:
+
+```text id="h3i9n8"
+Objects
+```
+
+2. Click:
+
+```text id="1y4qz2"
+index.html
+```
+
+3. Open:
+
+```text id="7ejm0f"
+Permissions
+```
+
+4. Scroll to:
+
+```text id="b6wl0s"
+Access Control List (ACL)
+```
+
+5. Click:
+
+```text id="o4mjza"
+Edit
+```
+
+6. Under:
+
+```text id="v4tc2g"
+Everyone (public access)
+```
+
+Enable:
+
+```text id="yfzppv"
+Read
+```
+
+7. Check confirmation checkbox
+
+8. Click:
+
+```text id="x6vg0k"
+Save changes
+```
+
+---
+
+# STEP 10 — OPEN WEBSITE
+
+1. Go back to:
+
+```text id="zy0o5h"
+Properties
+```
+
+2. Scroll to:
+
+```text id="sc6l4r"
+Static website hosting
+```
+
+3. Copy:
+
+```text id="r3qt4k"
+Bucket website endpoint
+```
+
+Example:
+
+```text id="h6js3l"
+http://bucket-name.s3-website-region.amazonaws.com
+```
+
+4. Open URL in browser
+
+---
+
+# EXPECTED OUTPUT
+
+Website should display:
+
+```text id="l1x54m"
+Welcome to My AWS S3 Static Website
+```
+
+---
+
+# IF YOU GET 403 ACCESS DENIED
+
+Check these:
+
+| Setting                | Must Be         |
+| ---------------------- | --------------- |
+| Block Public Access    | Disabled        |
+| ACLs                   | Enabled         |
+| Bucket ACL             | Everyone → Read |
+| index.html ACL         | Everyone → Read |
+| Static Website Hosting | Enabled         |
+
+---
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------
 week-5 vpc using EC2
 
+STEP 1 — LOGIN TO AWS
+Open AWS Console
+Login with your AWS account
+In search bar type:
+VPC
+Open Amazon VPC
+STEP 2 — CREATE VPC
+What is VPC?
+
+A VPC (Virtual Private Cloud) is your own private network inside AWS.
+
+Steps
+1. Open VPC Dashboard
+
+Left side menu:
+
+Your VPCs
+2. Click
+Create VPC
+3. Select
+VPC only
+4. Enter Details
+Field	Value
+Name tag	Custom-VPC
+IPv4 CIDR	10.0.0.0/16
+IPv6 CIDR	No IPv6
+Tenancy	Default
+5. Click
+Create VPC
+IMPORTANT CIDR EXPLANATION
+10.0.0.0/16
+
+Means:
+
+Network range = 10.0.0.0 to 10.0.255.255
+Total IPs ≈ 65,536
+
+Enough for future scaling.
+
+STEP 3 — CREATE PUBLIC SUBNET
+What is Public Subnet?
+
+A subnet connected to internet.
+
+Steps
+1. Left Menu → Subnets
+2. Click
+Create subnet
+3. Select VPC
+
+Choose:
+
+Custom-VPC
+4. Enter Details
+Field	Value
+Subnet name	Public-Subnet
+Availability Zone	ap-south-1a
+IPv4 CIDR	10.0.1.0/24
+5. Click
+Create subnet
+STEP 4 — CREATE PRIVATE SUBNET
+What is Private Subnet?
+
+A subnet without direct internet access.
+
+Steps
+
+Again click:
+
+Create subnet
+Enter
+Field	Value
+Subnet name	Private-Subnet
+Availability Zone	ap-south-1a
+IPv4 CIDR	10.0.2.0/24
+
+Click:
+
+Create subnet
+STEP 5 — CREATE INTERNET GATEWAY (IGW)
+What is IGW?
+
+Internet Gateway allows internet access to VPC.
+
+Steps
+1. Left Menu → Internet Gateways
+2. Click
+Create internet gateway
+3. Enter
+Field	Value
+Name	Custom-IGW
+4. Click
+Create internet gateway
+STEP 6 — ATTACH IGW TO VPC
+
+VERY IMPORTANT STEP
+
+Without attachment internet will NOT work.
+
+Steps
+Select:
+Custom-IGW
+Click:
+Actions
+Select:
+Attach to VPC
+Choose:
+Custom-VPC
+Click:
+Attach internet gateway
+STEP 7 — CREATE PUBLIC ROUTE TABLE
+What is Route Table?
+
+Controls traffic direction.
+
+Steps
+1. Left Menu → Route Tables
+2. Click
+Create route table
+3. Enter
+Field	Value
+Name	Public-RT
+VPC	Custom-VPC
+4. Click
+Create route table
+STEP 8 — ADD INTERNET ROUTE
+Steps
+1. Open
+Public-RT
+2. Go to
+Routes tab
+3. Click
+Edit routes
+4. Add Route
+Destination	Target
+0.0.0.0/0	Internet Gateway
+
+Select:
+
+Custom-IGW
+5. Save Changes
+WHY 0.0.0.0/0 ?
+
+Means:
+
+All internet traffic
+STEP 9 — ASSOCIATE PUBLIC SUBNET
+Steps
+1. In Public-RT
+
+Go to:
+
+Subnet Associations
+2. Click
+Edit subnet associations
+3. Select
+Public-Subnet
+4. Save
+STEP 10 — CREATE PRIVATE ROUTE TABLE
+Steps
+1. Create another route table
+Field	Value
+Name	Private-RT
+VPC	Custom-VPC
+2. Click
+Create route table
+STEP 11 — ASSOCIATE PRIVATE SUBNET
+Steps
+Open:
+Private-RT
+Go to:
+Subnet Associations
+Click:
+Edit subnet associations
+Select:
+Private-Subnet
+Save
+IMPORTANT
+
+Private route table should ONLY contain:
+
+local
+
+Do NOT add IGW route.
+
+STEP 12 — ENABLE AUTO PUBLIC IP
+
+Without this, EC2 won’t get public IP.
+
+Steps
+1. Open Subnets
+2. Select
+Public-Subnet
+3. Click
+Actions → Edit subnet settings
+4. Enable
+Auto-assign public IPv4
+5. Save
+STEP 13 — CREATE SECURITY GROUP
+What is Security Group?
+
+Acts like firewall.
+
+Controls inbound and outbound traffic.
+
+Steps
+1. Open EC2 Dashboard
+
+Search:
+
+EC2
+
+Open Amazon EC2
+
+2. Left Menu → Security Groups
+3. Click
+Create security group
+Enter
+Field	Value
+Name	Web-SG
+Description	Web Access
+VPC	Custom-VPC
+STEP 14 — ADD INBOUND RULES
+Add These Rules
+Type	Port	Source
+SSH	22	My IP
+HTTP	80	Anywhere
+HTTPS	443	Anywhere
+WHY “MY IP” FOR SSH?
+
+More secure.
+
+Only your laptop can SSH.
+
+STEP 15 — LAUNCH PUBLIC EC2
+Steps
+1. EC2 Dashboard
+2. Click
+Launch Instance
+Enter
+Field	Value
+Name	Public-EC2
+AMI	Amazon Linux
+Instance Type	t2.micro
+KEY PAIR
+Create new key pair
+
+Example:
+
+my-key.pem
+
+Download it safely.
+
+NETWORK SETTINGS
+
+Click:
+
+Edit
+Select
+Setting	Value
+VPC	Custom-VPC
+Subnet	Public-Subnet
+Auto Assign Public IP	Enable
+Security Group	Web-SG
+Click
+Launch Instance
+STEP 16 — CONNECT TO PUBLIC EC2
+Steps
+Select EC2
+Click:
+Connect
+Choose:
+EC2 Instance Connect
+Click:
+Connect
+TEST INTERNET
+
+Run:
+
+ping google.com
+
+If replies come:
+
+✔ Internet works
+
+STEP 17 — LAUNCH PRIVATE EC2
+
+Repeat EC2 creation.
+
+Important Changes
+Setting	Value
+Name	Private-EC2
+Subnet	Private-Subnet
+Public IP	Disable
+
+Launch instance.
 
 
 
