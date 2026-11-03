@@ -1,414 +1,633 @@
-----DynamicForm-----
-// Program 5: Dynamic form generated from a JavaScript configuration object
-// No extra packages needed. Usage: save as src/App.jsx
-import React, { useState } from "react";
 
-// ---------- Configuration object ----------
-const formConfig = {
-  title: "Student Registration",
-  fields: [
-    { name: "fullName", label: "Full Name", type: "text", placeholder: "Enter name", required: true },
-    { name: "email", label: "Email", type: "email", placeholder: "Enter email", required: true },
-    { name: "age", label: "Age", type: "number", placeholder: "Enter age" },
-    { name: "gender", label: "Gender", type: "radio", options: ["Male", "Female", "Other"] },
-    { name: "course", label: "Course", type: "select", options: ["BCA", "B.Tech", "MCA", "MBA"] },
-    { name: "skills", label: "Skills", type: "checkbox", options: ["React", "Java", "Python"] },
-    { name: "about", label: "About You", type: "textarea", placeholder: "Short description" },
-  ],
-};
+Week 2 | Experiment 2: GUI Checkpoint for Single Property
 
-// Build initial state from config
-const buildInitialState = (config) => {
-  const state = {};
-  config.fields.forEach((f) => {
-    state[f.name] = f.type === "checkbox" ? [] : "";
-  });
-  return state;
-};
+java
+// Exp 2: Single Property Checkpoint (Page Title)
+import javax.swing.JFrame;
 
-export default function App() {
-  const [formData, setFormData] = useState(buildInitialState(formConfig));
-  const [submitted, setSubmitted] = useState(null);
+public class Exp2_SinglePropertyCheckpoint {
+    public static void main(String[] args) throws InterruptedException { 
+        JFrame frame = new JFrame("Google"); // Fixed typo from 'new Frame' to 'new JFrame'
+        frame.setSize(400, 200); 
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        frame.setLocationRelativeTo(null); 
+        frame.setVisible(true);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (type === "checkbox") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: checked ? [...prev[name], value] : prev[name].filter((v) => v !== value),
-      }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+        String expectedTitle = "Google"; 
+        String actualTitle = frame.getTitle();
+        System.out.println("Actual Title : " + actualTitle); 
+        System.out.println("Expected Title : " + expectedTitle);
+
+        if (actualTitle.equals(expectedTitle)) { 
+            System.out.println("PASS: Title is correct");
+        } else {
+            System.out.println("FAIL: Title is incorrect");
+        }
+
+        Thread.sleep(2000); 
+        frame.dispose();
     }
-  };
+}
+Use code with caution.
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(formData);
-  };
+Week 3 | Experiment 3: GUI Checkpoint for Single Object/Window
 
-  // Render one field depending on its type
-  const renderField = (f) => {
-    switch (f.type) {
-      case "select":
-        return (
-          <select name={f.name} value={formData[f.name]} onChange={handleChange} required={f.required}>
-            <option value="">-- Select --</option>
-            {f.options.map((o) => <option key={o} value={o}>{o}</option>)}
-          </select>
-        );
-      case "radio":
-        return f.options.map((o) => (
-          <label key={o} style={{ marginRight: 12 }}>
-            <input type="radio" name={f.name} value={o}
-                   checked={formData[f.name] === o} onChange={handleChange} /> {o}
-          </label>
-        ));
-      case "checkbox":
-        return f.options.map((o) => (
-          <label key={o} style={{ marginRight: 12 }}>
-            <input type="checkbox" name={f.name} value={o}
-                   checked={formData[f.name].includes(o)} onChange={handleChange} /> {o}
-          </label>
-        ));
-      case "textarea":
-        return <textarea name={f.name} placeholder={f.placeholder}
-                         value={formData[f.name]} onChange={handleChange} />;
-      default:
-        return <input type={f.type} name={f.name} placeholder={f.placeholder}
-                      value={formData[f.name]} onChange={handleChange} required={f.required} />;
+java
+// Exp 3: Single Object Checkpoint (Element displayed and enabled)
+import javax.swing.*;
+
+public class Exp3_SingleObjectCheckpoint {
+    public static void main(String[] args) throws InterruptedException { 
+        JFrame frame = new JFrame("Single Object Checkpoint"); // Fixed typo from 'new Frame'
+        JTextField searchBox = new JTextField(20);
+        JPanel panel = new JPanel(); 
+        
+        panel.add(new JLabel("Search:")); 
+        panel.add(searchBox);
+        frame.add(panel); 
+        frame.setSize(400, 150);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        frame.setLocationRelativeTo(null); 
+        frame.setVisible(true);
+        
+        Thread.sleep(500);
+        
+        boolean displayed = searchBox.isShowing(); 
+        boolean enabled = searchBox.isEnabled();
+        System.out.println("Displayed: " + displayed); 
+        System.out.println("Enabled  : " + enabled);
+        
+        System.out.println(displayed && enabled ? "PASS: Search box is ready" : "FAIL: Search box is not ready");
+        
+        Thread.sleep(2000); 
+        frame.dispose();
     }
-  };
-
-  return (
-    <div style={{ maxWidth: 480, margin: "30px auto", fontFamily: "sans-serif" }}>
-      <h2>{formConfig.title}</h2>
-      <form onSubmit={handleSubmit}>
-        {formConfig.fields.map((f) => (
-          <div key={f.name} style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontWeight: "bold", marginBottom: 4 }}>
-              {f.label}{f.required && " *"}
-            </label>
-            {renderField(f)}
-          </div>
-        ))}
-        <button type="submit">Submit</button>
-      </form>
-
-      {submitted && (
-        <div style={{ marginTop: 25, padding: 12, background: "#f3f3f3" }}>
-          <h3>Submitted Data</h3>
-          {formConfig.fields.map((f) => (
-            <p key={f.name}>
-              <b>{f.label}:</b>{" "}
-              {Array.isArray(submitted[f.name]) ? submitted[f.name].join(", ") : submitted[f.name]}
-            </p>
-          ))}
-        </div>
-      )}
-    </div>
-  );
 }
+Use code with caution.
 
+Week 4 | Experiment 4(a): Bitmap Checkpoint for Object/Window
 
+java
+import javax.swing.*;
+import javax.imageio.ImageIO; 
+import java.awt.*;
+import java.awt.image.BufferedImage; 
+import java.io.File;
 
-
---------------------users------------------
-// Program 6: SPA with routing (Home, Users), useEffect + useState,
-// conditional rendering and a loading indicator.
-// Offline: the "public API" is replaced by a local function that returns
-// data after a delay (same behaviour as fetch, but no internet).
-// Needs: npm install react-router-dom (one-time). Usage: save as src/App.jsx
-import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
-
-// ---------- Fake API (replaces https://jsonplaceholder.typicode.com/users) ----------
-const USERS_DATA = [
-  { id: 1, name: "Leanne Graham", email: "leanne@example.com", city: "Hyderabad" },
-  { id: 2, name: "Ervin Howell", email: "ervin@example.com", city: "Chennai" },
-  { id: 3, name: "Clementine Bauch", email: "clem@example.com", city: "Mumbai" },
-  { id: 4, name: "Patricia Lebsack", email: "patricia@example.com", city: "Delhi" },
-  { id: 5, name: "Chelsey Dietrich", email: "chelsey@example.com", city: "Pune" },
-];
-
-const fetchUsers = (shouldFail = false) =>
-  new Promise((resolve, reject) => {
-    setTimeout(() => {
-      shouldFail ? reject(new Error("Failed to load users")) : resolve(USERS_DATA);
-    }, 2000); // simulate 2-second network delay
-  });
-
-// ---------- Pages ----------
-const Home = () => (
-  <div>
-    <h2>Home</h2>
-    <p>Open the Users page to see data loaded with useEffect.</p>
-  </div>
-);
-
-function Users() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchUsers()
-      .then((data) => setUsers(data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []); // runs once when the page mounts
-
-  // Conditional rendering
-  if (loading) return <p>Loading users...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-
-  return (
-    <div>
-      <h2>Users</h2>
-      <table border="1" cellPadding="8" style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr><th>ID</th><th>Name</th><th>Email</th><th>City</th></tr>
-        </thead>
-        <tbody>
-          {users.map((u) => (
-            <tr key={u.id}>
-              <td>{u.id}</td><td>{u.name}</td><td>{u.email}</td><td>{u.city}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-// ---------- App ----------
-export default function App() {
-  const link = ({ isActive }) => ({
-    marginRight: 15, fontWeight: isActive ? "bold" : "normal",
-  });
-  return (
-    <BrowserRouter>
-      <nav style={{ padding: 12, background: "#eee" }}>
-        <NavLink to="/" style={link}>Home</NavLink>
-        <NavLink to="/users" style={link}>Users</NavLink>
-      </nav>
-      <div style={{ padding: 20 }}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/users" element={<Users />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
-  );
-}
-
-
----------ecommerce--------------------
-// Program 4: Simplified e-commerce app with React Router (works fully offline)
-// Needs: npm install react-router-dom   (one-time; afterwards no internet needed)
-// Usage: save as src/App.jsx in a Vite/CRA project.
-import React, { createContext, useContext, useState } from "react";
-import {
-  BrowserRouter, Routes, Route, Link, NavLink,
-  Navigate, useParams, useNavigate, useLocation
-} from "react-router-dom";
-
-// ---------- Local data (no API) ----------
-const PRODUCTS = [
-  { id: 1, name: "Laptop", price: 55000, desc: "14-inch, 16GB RAM, 512GB SSD" },
-  { id: 2, name: "Headphones", price: 2500, desc: "Wireless, noise cancelling" },
-  { id: 3, name: "Smart Watch", price: 4000, desc: "Heart-rate and sleep tracking" },
-  { id: 4, name: "Backpack", price: 1200, desc: "Water-resistant, 25L" },
-];
-
-// ---------- Global state (auth + cart) ----------
-const AppContext = createContext();
-const useApp = () => useContext(AppContext);
-
-function AppProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [cart, setCart] = useState([]);
-
-  const addToCart = (product) => setCart((c) => [...c, product]);
-  const removeFromCart = (index) => setCart((c) => c.filter((_, i) => i !== index));
-
-  return (
-    <AppContext.Provider value={{ user, setUser, cart, addToCart, removeFromCart }}>
-      {children}
-    </AppContext.Provider>
-  );
-}
-  
-// ---------- Protected route ----------
-function ProtectedRoute({ children }) {
-  const { user } = useApp();
-  const location = useLocation();
-  if (!user) return <Navigate to="/login" state={{ from: location.pathname }} replace />;
-  return children;
-}
-
-// ---------- Navigation ----------
-function Navbar() {
-  const { user, setUser, cart } = useApp();
-  const navigate = useNavigate();
-  const style = ({ isActive }) => ({
-    marginRight: 15, textDecoration: "none",
-    fontWeight: isActive ? "bold" : "normal", color: isActive ? "#c0392b" : "#333",
-  });
-
-  return (
-    <nav style={{ padding: 12, background: "#eee", display: "flex", alignItems: "center" }}>
-      <NavLink to="/" style={style}>Home</NavLink>
-      <NavLink to="/products" style={style}>Products</NavLink>
-      <NavLink to="/contact" style={style}>Contact</NavLink>
-      <NavLink to="/cart" style={style}>Cart ({cart.length})</NavLink>
-      <span style={{ marginLeft: "auto" }}>
-        {user ? (
-          <>
-            Hi, {user}{" "}
-            <button onClick={() => { setUser(null); navigate("/"); }}>Logout</button>
-          </>
-        ) : (
-          <NavLink to="/login" style={style}>Login</NavLink>
-        )}
-      </span>
-    </nav>
-  );
-}
-
-// ---------- Pages ----------
-const Home = () => (
-  <div>
-    <h2>Welcome to MyShop</h2>
-    <p>Browse our products and add your favourites to the cart.</p>
-    <Link to="/products">Shop now</Link>
-  </div>
-);
-
-const Products = () => (
-  <div>
-    <h2>Products</h2>
-    {PRODUCTS.map((p) => (
-      <div key={p.id} style={{ border: "1px solid #ccc", padding: 10, margin: "10px 0" }}>
-        <h3>{p.name}</h3>
-        <p>₹{p.price}</p>
-        <Link to={`/products/${p.id}`}>View details</Link>
-      </div>
-    ))}
-  </div>
-);
-
-function ProductDetails() {
-  const { id } = useParams(); // dynamic routing
-  const { addToCart } = useApp();
-  const product = PRODUCTS.find((p) => p.id === Number(id));
-
-  if (!product) return <h2>Product not found</h2>;
-  return (
-    <div>
-      <h2>{product.name}</h2>
-      <p>{product.desc}</p>
-      <p><b>₹{product.price}</b></p>
-      <button onClick={() => addToCart(product)}>Add to cart</button>{" "}
-      <Link to="/products">Back</Link>
-    </div>
-  );
-}
-
-function Contact() {
-  const [sent, setSent] = useState(false);
-  return (
-    <div>
-      <h2>Contact Us</h2>
-      {sent ? (
-        <p>Thanks! We will get back to you.</p>
-      ) : (
-        <>
-          <input placeholder="Your email" /><br /><br />
-          <textarea placeholder="Message" /><br /><br />
-          <button onClick={() => setSent(true)}>Send</button>
-        </>
-      )}
-    </div>
-  );
-}
-
-function Login() {
-  const { setUser } = useApp();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [name, setName] = useState("");
-  const [pass, setPass] = useState("");
-  const [error, setError] = useState("");
-
-  const handleLogin = () => {
-    // Demo credentials: any name with password "1234"
-    if (name && pass === "1234") {
-      setUser(name);
-      navigate(location.state?.from || "/", { replace: true });
-    } else {
-      setError("Enter a username and the password 1234");
+public class NewTest {
+    public static void main(String[] args) throws Exception { 
+        JFrame frame = new JFrame("Bitmap Checkpoint Test"); 
+        JTextField searchBox = new JTextField("Search here", 20); 
+        JPanel panel = new JPanel();
+        panel.add(searchBox); 
+        frame.add(panel); 
+        frame.setSize(350, 120);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        frame.setLocationRelativeTo(null); 
+        frame.setVisible(true);
+        
+        Thread.sleep(1000);
+        File folder = new File("Screenshots"); 
+        if (!folder.exists()) folder.mkdir();
+        
+        BufferedImage currentImage = new BufferedImage(searchBox.getWidth(), searchBox.getHeight(), BufferedImage.TYPE_INT_ARGB); // Changed to ARGB for accurate background color rendering
+        Graphics2D g2 = currentImage.createGraphics(); 
+        searchBox.paint(g2);
+        g2.dispose();
+        
+        File currentFile = new File("Screenshots/current_searchbox.png"); 
+        ImageIO.write(currentImage, "png", currentFile); 
+        System.out.println("Current screenshot saved: " + currentFile.getAbsolutePath());
+        
+        File baselineFile = new File("Screenshots/baseline_searchbox.png"); 
+        if (!baselineFile.exists()) {
+            System.out.println("Baseline image not found. Rename current_searchbox.png as baseline_searchbox.png");
+        } else {
+            boolean result = compareImages(baselineFile, currentFile); 
+            if (result) {
+                System.out.println("BITMAP CHECKPOINT : TEST PASS\nImages are identical.");
+            } else {
+                System.out.println("BITMAP CHECKPOINT : TEST FAIL\nImages are different.");
+            }
+        }
+        Thread.sleep(2000); 
+        frame.dispose();
     }
-  };
-
-  return (
-    <div>
-      <h2>Login</h2>
-      <input placeholder="Username" value={name} onChange={(e) => setName(e.target.value)} /><br /><br />
-      <input type="password" placeholder="Password (1234)" value={pass}
-             onChange={(e) => setPass(e.target.value)} /><br /><br />
-      <button onClick={handleLogin}>Login</button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-    </div>
-  );
+    
+    public static boolean compareImages(File img1, File img2) throws Exception { 
+        BufferedImage image1 = ImageIO.read(img1);
+        BufferedImage image2 = ImageIO.read(img2);
+        if (image1.getWidth() != image2.getWidth() || image1.getHeight() != image2.getHeight())
+            return false;
+        for (int x = 0; x < image1.getWidth(); x++) {
+            for (int y = 0; y < image1.getHeight(); y++) {
+                if (image1.getRGB(x, y) != image2.getRGB(x, y))
+                    return false;
+            }
+        }
+        return true;
+    }
 }
+Use code with caution.
 
-function Cart() {
-  const { cart, removeFromCart } = useApp();
-  const total = cart.reduce((sum, p) => sum + p.price, 0);
-  return (
-    <div>
-      <h2>Your Cart</h2>
-      {cart.length === 0 ? <p>Cart is empty.</p> : (
-        <>
-          {cart.map((p, i) => (
-            <p key={i}>
-              {p.name} - ₹{p.price}{" "}
-              <button onClick={() => removeFromCart(i)}>Remove</button>
-            </p>
-          ))}
-          <h3>Total: ₹{total}</h3>
-        </>
-      )}
-    </div>
-  );
+Week 5 | Experiment 4(b): Bitmap Checkpoint for Screen Area
+
+java
+import javax.swing.*;
+import javax.imageio.ImageIO; 
+import java.awt.*;
+import java.awt.image.BufferedImage; 
+import java.io.File;
+
+public class NewTestArea {
+    public static void main(String[] args) throws Exception { 
+        JFrame frame = new JFrame("Bitmap Area Checkpoint"); 
+        JPanel panel = new JPanel(new FlowLayout()); 
+        panel.add(new JLabel("Google Search")); 
+        panel.add(new JTextField(25));
+        panel.add(new JButton("Search")); 
+        frame.add(panel); 
+        frame.setSize(800, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        frame.setLocationRelativeTo(null); 
+        frame.setVisible(true);
+        
+        Thread.sleep(1000);
+        BufferedImage fullImage = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_ARGB); 
+        Graphics2D g2 = fullImage.createGraphics();
+        frame.paint(g2); 
+        g2.dispose();
+        
+        File folder = new File("SeleniumScreenshots"); 
+        if (!folder.exists()) folder.mkdirs();
+        
+        int width = Math.min(800, fullImage.getWidth()); 
+        int height = Math.min(600, fullImage.getHeight());
+        BufferedImage currentArea = fullImage.getSubimage(0, 0, width, height);
+        
+        File currentFile = new File("SeleniumScreenshots/current_google_area.png"); 
+        ImageIO.write(currentArea, "png", currentFile);
+        System.out.println("Current screenshot saved: " + currentFile.getAbsolutePath());
+        
+        File baselineFile = new File("SeleniumScreenshots/baseline_google_area.png"); 
+        if (!baselineFile.exists()) {
+            System.out.println("Baseline image not found. Rename current_google_area.png to baseline_google_area.png");
+        } else {
+            BufferedImage baseline = ImageIO.read(baselineFile); 
+            double similarity = compareImages(baseline, currentArea);
+            System.out.printf("Image Similarity : %.2f%%%n", similarity); 
+            if (similarity >= 95)
+                System.out.println("BITMAP CHECKPOINT : TEST PASS"); 
+            else
+                System.out.println("BITMAP CHECKPOINT : TEST FAIL");
+        }
+        Thread.sleep(2000); 
+        frame.dispose();
+    }
+    
+    public static double compareImages(BufferedImage img1, BufferedImage img2) { 
+        if (img1.getWidth() != img2.getWidth() || img1.getHeight() != img2.getHeight()) return 0;
+        long totalPixels = (long) img1.getWidth() * img1.getHeight(); 
+        long samePixels = 0;
+        for (int x = 0; x < img1.getWidth(); x++) {
+            for (int y = 0; y < img1.getHeight(); y++) {
+                if (img1.getRGB(x, y) == img2.getRGB(x, y)) samePixels++;
+            }
+        }
+        return ((double) samePixels / totalPixels) * 100;
+    }
 }
+Use code with caution.
 
-const NotFound = () => (
-  <div>
-    <h2>404 - Page Not Found</h2>
-    <Link to="/">Go back home</Link>
-  </div>
-);
+Week 6 | Experiment 5: Database Checkpoint – Default Check
 
-// ---------- App ----------
-export default function App() {
-  return (
-    <AppProvider>
-      <BrowserRouter>
-        <Navbar />
-        <div style={{ padding: 20 }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/:id" element={<ProductDetails />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
-    </AppProvider>
-  );
+java
+import java.sql.Connection; 
+import java.sql.DriverManager; 
+import java.sql.ResultSet; 
+import java.sql.Statement;
+
+public class DatabaseDefaultCheck {
+    public static void main(String[] args) { 
+        try {
+            Connection con = DriverManager.getConnection("jdbc:h2:./StudentDB", "sa", "");
+            Statement stmt = con.createStatement();
+            stmt.execute("CREATE TABLE IF NOT EXISTS STUDENT (ID INT PRIMARY KEY, NAME VARCHAR(50), EMAIL VARCHAR(100))");
+            stmt.execute("DELETE FROM STUDENT"); 
+            stmt.executeUpdate("INSERT INTO STUDENT VALUES (1, 'Ajay', 'ajay@gmail.com')");
+            
+            ResultSet rs = stmt.executeQuery("SELECT * FROM STUDENT WHERE ID = 1");
+            if (rs.next()) { 
+                System.out.println("Record Exists");
+                System.out.println("ID : " + rs.getInt("ID")); 
+                System.out.println("Name : " + rs.getString("NAME")); 
+                System.out.println("Email : " + rs.getString("EMAIL")); 
+                System.out.println("TEST PASSED");
+            } else {
+                System.out.println("Record Not Found"); 
+                System.out.println("TEST FAILED");
+            }
+            rs.close();
+            stmt.close();
+            con.close();
+        } catch (Exception e) { 
+            e.printStackTrace();
+        }
+    }
+}
+Use code with caution.
+
+Week 7 | Experiment 6: Database Checkpoint – Custom Check
+
+java
+import java.sql.*;
+
+public class DatabaseCheckpointCustomCheck {
+    static final String DB_URL = "jdbc:sqlite:student.db";
+    
+    public static void setupDatabase() throws SQLException {
+        try (Connection conn = DriverManager.getConnection(DB_URL); 
+             Statement stmt = conn.createStatement()) { 
+            stmt.execute("CREATE TABLE IF NOT EXISTS students (id INTEGER PRIMARY KEY, name TEXT, marks INTEGER)");
+            stmt.execute("DELETE FROM students");
+            stmt.execute("INSERT INTO students VALUES (1, 'Amit', 78)"); 
+            stmt.execute("INSERT INTO students VALUES (2, 'Neha', 45)"); 
+            stmt.execute("INSERT INTO students VALUES (3, 'Ravi', 92)");
+        }
+    }
+    
+    public static boolean customCheckpoint(int studentId, String expectedStatus) throws SQLException {
+        try (Connection conn = DriverManager.getConnection(DB_URL); 
+             PreparedStatement ps = conn.prepareStatement("SELECT marks FROM students WHERE id = ?")) { 
+            ps.setInt(1, studentId);
+            ResultSet rs = ps.executeQuery();
+            if (!rs.next()) {
+                System.out.println("FAIL: No record found for id " + studentId); 
+                return false;
+            }
+            int marks = rs.getInt("marks");
+            String actualStatus = (marks >= 50) ? "Pass" : "Fail";
+            if (actualStatus.equals(expectedStatus)) { 
+                System.out.println("PASS: Student " + studentId + " status = " + actualStatus + " (Custom check matched)");
+                return true;
+            } else {
+                System.out.println("FAIL: Student " + studentId + " expected " + expectedStatus + ", got " + actualStatus); 
+                return false;
+            }
+        }
+    }
+    
+    public static void main(String[] args) throws Exception { 
+        setupDatabase();
+        customCheckpoint(1, "Pass"); 
+        customCheckpoint(2, "Fail"); 
+        customCheckpoint(3, "Pass");
+    }
+}
+Use code with caution.
+
+Week 8 | Experiment 7(a): Data Driven Test – Dynamic Test Data Submission
+
+java
+import java.util.Random;
+
+public class DynamicDataTest {
+    public static double calculateDiscount(double price, String category) { 
+        switch (category) {
+            case "electronics": return price * 0.9; 
+            case "clothing": return price * 0.8; 
+            default: return price;
+        }
+    }
+    
+    public static void main(String[] args) {
+        String[] categories = {"electronics", "clothing", "grocery"}; 
+        Random rand = new Random();
+        System.out.println("---- Dynamic Test Data Submission ----");
+        for (int i = 1; i <= 5; i++) {
+            int price = 100 + rand.nextInt(901);
+            String category = categories[rand.nextInt(categories.length)]; 
+            double result = calculateDiscount(price, category);
+            System.out.printf("Test %d: price=%d, category=%s -> discounted=%.2f%n", i, price, category, result);
+        }
+    }
+}
+Use code with caution.
+
+Week 8 | Experiment 7(b): Data Driven Test – Through Flat Files (CSV/TXT)
+
+java
+import java.io.*;
+
+public class FlatFileTest {
+    public static double calculateDiscount(double price, String category) { 
+        switch (category) {
+            case "electronics": return price * 0.9; 
+            case "clothing": return price * 0.8; 
+            default: return price;
+        }
+    }
+    
+    public static void createFlatFile() throws IOException {
+        try (PrintWriter pw = new PrintWriter(new FileWriter("testdata.txt"))) { 
+            pw.println("500,electronics");
+            pw.println("300,clothing"); 
+            pw.println("150,grocery");
+        }
+    }
+    
+    public static void flatFileTest() throws IOException { 
+        System.out.println("---- Data Driven Test via Flat File ----");
+        try (BufferedReader br = new BufferedReader(new FileReader("testdata.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) { 
+                String[] parts = line.split(",");
+                double price = Double.parseDouble(parts[0]); 
+                String category = parts[1];
+                double result = calculateDiscount(price, category); 
+                System.out.printf("price=%.1f, category=%s -> discounted=%.2f%n", price, category, result);
+            }
+        }
+    }
+    
+    public static void main(String[] args) throws IOException { 
+        createFlatFile();
+        flatFileTest();
+    }
+}
+Use code with caution.
+
+Week 9 | Experiment 7(c): Data Driven Test – Through Front Grids
+
+java
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+public class FrontEndGridTest {
+    public static double calculateDiscount(double price, String category) { 
+        switch (category) {
+            case "electronics": return price * 0.9; 
+            case "clothing": return price * 0.8; 
+            default: return price;
+        }
+    }
+    
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Front End Grid - Data Driven Test"); 
+        String[] columns = {"Price", "Category", "Result"}; 
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        Object[][] gridData = {
+            {500.0, "electronics"},
+            {300.0, "clothing"},
+            {150.0, "grocery"}
+        };
+        for (Object[] row : gridData) { 
+            double price = (double) row[0];
+            String category = (String) row[1];
+            double result = calculateDiscount(price, category); 
+            model.addRow(new Object[]{price, category, String.format("%.2f", result)});
+        }
+        JTable table = new JTable(model); 
+        frame.add(new JScrollPane(table)); 
+        frame.setSize(400, 200);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        frame.setVisible(true);
+    }
+}
+Use code with caution.
+
+Week 9 | Experiment 7(d): Data Driven Test – Through Excel
+
+java
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook; 
+import java.io.*; 
+
+public class ExcelDrivenTest {
+    public static double calculateDiscount(double price, String category) { 
+        switch (category) {
+            case "electronics": return price * 0.9; 
+            case "clothing": return price * 0.8; 
+            default: return price;
+        }
+    }
+    
+    public static void createExcelFile() throws IOException { 
+        Workbook wb = new XSSFWorkbook();
+        Sheet sheet = wb.createSheet("TestData");
+        Object[][] data = {
+            {"Price", "Category"},
+            {500.0, "electronics"},
+            {300.0, "clothing"},
+            {150.0, "grocery"}
+        };
+        for (int r = 0; r < data.length; r++) { 
+            Row row = sheet.createRow(r);
+            for (int c = 0; c < data[r].length; c++) { 
+                Cell cell = row.createCell(c);
+                if (data[r][c] instanceof Double) cell.setCellValue((Double) data[r][c]);
+                else cell.setCellValue((String) data[r][c]);
+            }
+        }
+        try (FileOutputStream fos = new FileOutputStream("testdata.xlsx")) { 
+            wb.write(fos);
+        }
+        wb.close();
+    }
+    
+    public static void excelDrivenTest() throws IOException { 
+        System.out.println("---- Data Driven Test via Excel ----");
+        try (FileInputStream fis = new FileInputStream("testdata.xlsx"); 
+             Workbook wb = new XSSFWorkbook(fis)) {
+            Sheet sheet = wb.getSheetAt(0);
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) continue;
+                double price = row.getCell(0).getNumericCellValue(); 
+                String category = row.getCell(1).getStringCellValue(); 
+                double result = calculateDiscount(price, category);
+                System.out.printf("price=%.1f, category=%s -> discounted=%.2f%n", price, category, result);
+            }
+        }
+    }
+    
+    public static void main(String[] args) throws IOException { 
+        createExcelFile();
+        excelDrivenTest();
+    }
+}
+Use code with caution.
+
+Week 10 | Experiment 7(e): Batch Testing – Without Parameter Passing
+
+java
+public class BatchNoParams {
+    public static void testAddition() { 
+        assert 2 + 3 == 5;
+        System.out.println("test_addition: PASS");
+    }
+    public static void testSubtraction() { 
+        assert 5 - 2 == 3;
+        System.out.println("test_subtraction: PASS");
+    }
+    public static void main(String[] args) {
+        System.out.println("---- Batch Testing (No Parameters) ----");
+        testAddition(); 
+        testSubtraction();
+    }
+}
+Use code with caution.
+
+Week 10 | Experiment 7(f): Batch Testing – With Parameter Passing
+
+java
+public class BatchWithParams {
+    static void testOperation(int a, int b, char op, int expected) { 
+        int result = 0;
+        switch (op) {
+            case '+': result = a + b; break; 
+            case '-': result = a - b; break; 
+            case '*': result = a * b; break;
+        }
+        String status = (result == expected) ? "PASS" : "FAIL"; 
+        System.out.printf("Test: %d %c %d = %d (expected %d) -> %s%n", a, op, b, result, expected, status);
+    }
+    
+    public static void main(String[] args) { 
+        int[][] testCases = {{2, 3, '+', 5}, {10, 4, '-', 6}, {3, 3, '*', 9}, {5, 5, '-', 1}};
+        System.out.println("---- Batch Testing (With Parameters) ----");
+        for (int[] tc : testCases) {
+            testOperation(tc[0], tc[1], (char) tc[2], tc[3]);
+        }
+    }
+}
+Use code with caution.
+
+Week 11 | Experiment 8: Data Driven Batch
+
+java
+import java.io.*;
+
+public class DataDrivenBatch {
+    public static double calculateDiscount(double price, String category) { 
+        switch (category) {
+            case "electronics": return price * 0.9; 
+            case "clothing": return price * 0.8; 
+            default: return price;
+        }
+    }
+    
+    public static void createCsvFile() throws IOException {
+        try (PrintWriter pw = new PrintWriter(new FileWriter("batch_data.csv"))) { 
+            pw.println("Price,Category,ExpectedResult"); 
+            pw.println("500,electronics,450");
+            pw.println("300,clothing,240"); 
+            pw.println("150,grocery,150"); 
+            pw.println("1000,electronics,900");
+        }
+    }
+    
+    public static void dataDrivenBatch() throws IOException { 
+        System.out.println("---- Data Driven Batch Test ----");
+        int passCount = 0, failCount = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader("batch_data.csv"))) { 
+            String line = br.readLine(); // Read header
+            while ((line = br.readLine()) != null) { 
+                String[] parts = line.split(",");
+                double price = Double.parseDouble(parts[0]); 
+                String category = parts[1];
+                double expected = Double.parseDouble(parts[2]); 
+                double actual = calculateDiscount(price, category);
+                if (actual == expected) { 
+                    System.out.printf("PASS: %s, price=%.1f -> %.1f%n", category, price, actual);
+                    passCount++;
+                } else {
+                    System.out.printf("FAIL: %s, price=%.1f -> got %.1f, expected %.1f%n", category, price, actual, expected);
+                    failCount++;
+                }
+            }
+        }
+        System.out.println("\nBatch Summary: " + passCount + " Passed, " + failCount + " Failed");
+    }
+    
+    public static void main(String[] args) throws IOException { 
+        createCsvFile();
+        dataDrivenBatch();
+    }
+}
+Use code with caution.
+
+Week 12 | Experiment 9: Silent Mode Test Execution
+
+java
+import java.util.logging.*; 
+import java.io.IOException;
+
+public class SilentModeTest {
+    static Logger logger = Logger.getLogger("SilentTestLogger");
+    
+    static void setupLogger() throws IOException { 
+        logger.setUseParentHandlers(false);
+        FileHandler fh = new FileHandler("silent_test_log.txt"); 
+        fh.setFormatter(new SimpleFormatter()); 
+        logger.addHandler(fh);
+    }
+    
+    static void testCase(String name, Object actual, Object expected) { 
+        try {
+            if (actual.equals(expected)) {
+                logger.info(name + ": PASS (actual=" + actual + ", expected=" + expected + ")");
+            } else {
+                logger.severe(name + ": FAIL (actual=" + actual + ", expected=" + expected + ")");
+            }
+        } catch (Exception e) {
+            logger.severe(name + ": ERROR - " + e.getMessage());
+        }
+    }
+    
+    public static void main(String[] args) throws IOException { 
+        setupLogger();
+        testCase("Addition Test", 2 + 2, 4);
+        testCase("Subtraction Test", 10 - 5, 5);
+        testCase("Multiplication Test", 3 * 3, 10); 
+        testCase("String Test", "abc".toUpperCase(), "ABC");
+        System.out.println("Batch execution completed silently. Check silent_test_log.txt for results.");
+    }
+}
+Use code with caution.
+
+Week 13 | Experiment 10: Test Case for Calculator in Windows Application
+
+java
+import java.awt.*;
+import java.awt.event.KeyEvent; 
+import java.awt.image.BufferedImage; 
+import javax.imageio.ImageIO;
+import java.io.File;
+
+public class CalculatorTest {
+    public static void main(String[] args) throws Exception { 
+        Runtime.getRuntime().exec("calc.exe"); 
+        Thread.sleep(2000);
+        
+        Robot robot = new Robot(); 
+        robot.setAutoDelay(200);
+        
+        typeKey(robot, KeyEvent.VK_7); 
+        typeKey(robot, KeyEvent.VK_ADD); 
+        typeKey(robot, KeyEvent.VK_5); 
+        typeKey(robot, KeyEvent.VK_EQUALS);
+        
+        Thread.sleep(1000);
+        Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+        BufferedImage capture = robot.createScreenCapture(screenRect);
+        ImageIO.write(capture, "png", new File("calculator_result.png"));
+        
+        System.out.println("Test executed: 7 + 5 ="); 
+        System.out.println("Screenshot saved as calculator_result.png -- compare visually to confirm result is 12");
+    }
+    
+    static void typeKey(Robot robot, int keyCode) { 
+        robot.keyPress(keyCode); 
+        robot.keyRelease(keyCode);
+    }
 }
